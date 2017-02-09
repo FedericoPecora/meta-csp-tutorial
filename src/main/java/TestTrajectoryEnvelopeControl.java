@@ -100,7 +100,7 @@ public class TestTrajectoryEnvelopeControl {
 		metaSolver.refineTrajectoryEnvelopes();
 		
 		JTSDrawingPanel.drawConstraintNetwork("Geometries", solver.getConstraintNetwork());
-		ConstraintNetwork.draw(solver.getConstraintNetwork(), "Constraint Network");
+		//ConstraintNetwork.draw(solver.getConstraintNetwork(), "Constraint Network");
 		
 		//Call the scheduler (backtracking search over assignments of meta-values to meta-variables)
 		//  -- in this case, this means search in the space of resolving BeforeOrMeets constraints
@@ -122,8 +122,7 @@ public class TestTrajectoryEnvelopeControl {
 			DispatchingFunction df = new DispatchingFunction("Robot"+i) {
 				@Override
 				public boolean skip(SymbolicVariableActivity act) {
-					// TODO Auto-generated method stub
-					return false;
+					return act.getSymbols()[0].contains("Parking");
 				}
 				@Override
 				public void dispatch(final SymbolicVariableActivity act) {
