@@ -1,0 +1,7 @@
+(Variable goto_ur goto_ur MiR)
+(Variable goto_delivery goto_delivery MiR) 
+(Variable place_obj place_obj UR)
+(Constraint Duration goto_ur goto_ur [4000,INF])
+(Constraint Duration goto_delivery goto_delivery [4000,INF])
+(Constraint Duration place_obj place_obj [4000,INF])
+(Constraint Meets goto_ur place_obj)  (Constraint Before place_obj goto_delivery)
