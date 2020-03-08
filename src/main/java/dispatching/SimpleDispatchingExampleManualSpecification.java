@@ -28,17 +28,16 @@ import java.io.InputStreamReader;
 import java.util.Calendar;
 
 import org.metacsp.dispatching.DispatchingFunction;
-import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.multi.activity.ActivityNetworkSolver;
 import org.metacsp.multi.activity.SymbolicVariableActivity;
+import org.metacsp.multi.allenInterval.AllenIntervalConstraint;
 import org.metacsp.sensing.ConstraintNetworkAnimator;
+import org.metacsp.time.APSPSolver;
 import org.metacsp.time.Bounds;
 import org.metacsp.utility.timelinePlotting.TimelinePublisher;
 import org.metacsp.utility.timelinePlotting.TimelineVisualizer;
 
-import util.Parsing;
-
-public class SimpleDispatchingExample {	
+public class SimpleDispatchingExampleManualSpecification {	
 	
 	public static void main(String[] args) {
 
@@ -47,14 +46,65 @@ public class SimpleDispatchingExample {
 		// Create ActivityNetworkSolver, origin = current time
 		ActivityNetworkSolver ans = new ActivityNetworkSolver(origin,origin+100000);
 
-		// Parse the specification...
-		Parsing.setVariableFactory(ans);
-		ConstraintNetwork cn = Parsing.loadSpecification("specification.txt");
-		// ... and add the parsed constraints
-		boolean added = ans.addConstraints(cn.getConstraints());
+		// Here is the example...
+		/*
+		 *                     Delivery location
+		 *                             x
+		 *                             ^
+		 *                             | 
+		 *                             |
+		 *                             |
+		 * MiR location                |
+		 *      x -------------------> x
+		 *                       UR location
+		 */
+		
+		// Let's construct the example manually...
+		// We make one variable for each meaningful activity
+		SymbolicVariableActivity goto_ur = (SymbolicVariableActivity)ans.createVariable("MiR");
+		goto_ur.setSymbolicDomain("goto_ur");
+		SymbolicVariableActivity goto_delivery = (SymbolicVariableActivity)ans.createVariable("MiR");
+		goto_delivery.setSymbolicDomain("goto_delivery");
+		SymbolicVariableActivity place_obj = (SymbolicVariableActivity)ans.createVariable("UR");
+		place_obj.setSymbolicDomain("place_obj");
+
+		// Set the minimum durations of activities (at least 3 seconds for all activities, just as an example)
+		AllenIntervalConstraint goto_ur_min_duration = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, new Bounds(3000,APSPSolver.INF));
+		goto_ur_min_duration.setFrom(goto_ur);
+		goto_ur_min_duration.setTo(goto_ur);
+
+		AllenIntervalConstraint goto_delivery_min_duration = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, new Bounds(3000,APSPSolver.INF));
+		goto_delivery_min_duration.setFrom(goto_delivery);
+		goto_delivery_min_duration.setTo(goto_delivery);
+
+		AllenIntervalConstraint place_obj_min_duration = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Duration, new Bounds(3000,APSPSolver.INF));
+		place_obj_min_duration.setFrom(place_obj);
+		place_obj_min_duration.setTo(place_obj);
+
+		// Add the desired temporal relations between activities
+		// That is, MiR has to be finished with goto_ur before UR starts palce_obj  
+		AllenIntervalConstraint goto_meets_place = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before);
+		goto_meets_place.setFrom(goto_ur);
+		goto_meets_place.setTo(place_obj);
+
+		// ... and UR has to have finished place_obj before MiR can start goto_delivery
+		AllenIntervalConstraint place_before_goto = new AllenIntervalConstraint(AllenIntervalConstraint.Type.Before);
+		place_before_goto.setFrom(place_obj);
+		place_before_goto.setTo(goto_delivery);
+		
+		// Now we add the specified constraints to the solver
+		boolean added = ans.addConstraints(
+				goto_ur_min_duration,
+				goto_delivery_min_duration,
+				place_obj_min_duration,
+				goto_meets_place,
+				place_before_goto
+				);
+
+		//... which checks for consistency
 		System.out.println("Constraints consistent? " + added);
 
-		
+
 		/**
 		 * Now let's make this come alive!
 		 */

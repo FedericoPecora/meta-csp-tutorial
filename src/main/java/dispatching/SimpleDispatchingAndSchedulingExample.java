@@ -29,6 +29,12 @@ import java.util.Calendar;
 
 import org.metacsp.dispatching.DispatchingFunction;
 import org.metacsp.framework.ConstraintNetwork;
+import org.metacsp.framework.Variable;
+import org.metacsp.meta.symbolsAndTime.ReusableResource;
+import org.metacsp.meta.symbolsAndTime.Scheduler;
+import org.metacsp.meta.symbolsAndTime.StateVariable;
+import org.metacsp.meta.symbolsAndTime.StateVariableScheduler;
+import org.metacsp.multi.activity.Activity;
 import org.metacsp.multi.activity.ActivityNetworkSolver;
 import org.metacsp.multi.activity.SymbolicVariableActivity;
 import org.metacsp.sensing.ConstraintNetworkAnimator;
@@ -38,37 +44,60 @@ import org.metacsp.utility.timelinePlotting.TimelineVisualizer;
 
 import util.Parsing;
 
-public class SimpleDispatchingExampleWithSpecification {	
+public class SimpleDispatchingAndSchedulingExample {	
 	
 	public static void main(String[] args) {
 
 		long origin = Calendar.getInstance().getTimeInMillis();
-		//Create ActivityNetworkSolver, origin = current time
-		ActivityNetworkSolver ans = new ActivityNetworkSolver(origin,origin+100000);
-
-		Parsing.setVariableFactory(ans);
-
-		ConstraintNetwork cn = Parsing.loadSpecification("specification.txt");
 		
+		// Create Scheduler, origin = current time
+		Scheduler svs = new Scheduler(origin, origin+100000, 0);
+		
+		// Get the Scheduler's underlying ActivityNetworkSolver
+		ActivityNetworkSolver ans = (ActivityNetworkSolver)svs.getConstraintSolversFromConstraintSolverHierarchy(ActivityNetworkSolver.class)[0];
+
+		// Parse the specification...
+		Parsing.setVariableFactory(ans);
+		ConstraintNetwork cn = Parsing.loadSpecification("specification2.txt");
+		// ... and add the parsed constraints
 		boolean added = ans.addConstraints(cn.getConstraints());
-
 		System.out.println("Constraints consistent? " + added);
+		
+		// Make a StateVariable for the UR which can be used for scheduling
+		// This tells the scheduler that for the UR, it must enforce states that overlap in time
+		// must not be conflicting
+		StateVariable ur_capacity = new StateVariable(null, null, svs, new String[] {});
+		for (Variable var : ans.getVariables("UR")) ur_capacity.setUsage((Activity)var);
+		svs.addMetaConstraint(ur_capacity);
+		// Ask the scheduler to make sure that there are no conflicts
+		// (solve the scheduling problem by imposing temporal constraints that remove temporal overlap)
+		System.out.println("Solved? " + svs.backtrack());
 
-
+		
 		/**
 		 * Now let's make this come alive!
 		 */
 
-		//Create animator and tell it to animate the ActivityNetworkSolver w/ period 100 msec
+		// Create animator and tell it to animate the ActivityNetworkSolver w/ period 100 msec
 		ConstraintNetworkAnimator animator = new ConstraintNetworkAnimator(ans, 100);
 
-		final DispatchingFunction df_mir = new DispatchingFunction("MiR") {	
+		final DispatchingFunction df_mir_1 = new DispatchingFunction("MiR_1") {	
 			@Override
 			public boolean skip(SymbolicVariableActivity act) { return false; }
 
 			@Override
 			public void dispatch(SymbolicVariableActivity act) {
-				System.out.println("MiR starts executing " + act.getSymbols()[0]);
+				System.out.println(act.getComponent() + " starts executing " + act.getSymbols()[0]);
+			}
+		};
+
+		final DispatchingFunction df_mir_2 = new DispatchingFunction("MiR_2") {	
+			@Override
+			public boolean skip(SymbolicVariableActivity act) { return false; }
+
+			@Override
+			public void dispatch(SymbolicVariableActivity act) {
+				System.out.println(act.getComponent() + " starts executing " + act.getSymbols()[0]);
 			}
 		};
 
@@ -78,19 +107,19 @@ public class SimpleDispatchingExampleWithSpecification {
 
 			@Override
 			public void dispatch(SymbolicVariableActivity act) {
-				System.out.println("UR starts executing " + act.getSymbols()[0]);
+				System.out.println(act.getComponent() + " starts executing " + act.getSymbols()[0]);
 			}
 		};
 
-		animator.addDispatchingFunctions(df_mir,df_ur);
+		animator.addDispatchingFunctions(df_mir_1,df_mir_2,df_ur);
 		
-		//Visualize progression, with automatic update every 100 msec 
-		//Add these args if you have scaling problems: -Dsun.java2d.uiScale=2.5
-		TimelinePublisher tp = new TimelinePublisher(ans.getConstraintNetwork(), new Bounds(0,60000), true, "MiR", "UR", "Time");
+		// Visualize progression, with automatic update every 100 msec 
+		// Add these args if you have scaling problems: -Dsun.java2d.uiScale=2
+		TimelinePublisher tp = new TimelinePublisher(ans.getConstraintNetwork(), new Bounds(0,60000), true, "MiR_1", "MiR_2", "UR", "Time");
 		TimelineVisualizer tv = new TimelineVisualizer(tp);
 		tv.startAutomaticUpdate(100);
 		
-		//Poor Man's key listener ;-)
+		// Poor Man's key listener ;-)
 		while (true) {			
 			System.out.println("Executing activities (press <enter> to refresh list):");
 			SymbolicVariableActivity[] acts = animator.getDispatcher().getStartedActs();
@@ -113,11 +142,7 @@ public class SimpleDispatchingExampleWithSpecification {
 				catch(NumberFormatException nfe) { }
 				catch(ArrayIndexOutOfBoundsException aiob) { }
 			}
-
 		}
-
 	}
-
-
 
 }

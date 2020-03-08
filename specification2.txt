@@ -1,0 +1,30 @@
+# FORMAT:
+# (Variable variable_id symbol+ component)
+# (Constraint type variable_id variable_id [lb,ub]*)
+# please see XX for constraint types and bounds
+
+# Each MiR does two things: goto_ur and goto_delivery
+# The UR does one thing: place_obj onto a MiR
+# There are two MiR components (MiR_1 and MiR_2) and one UR component
+(Variable v1 goto_ur MiR_1)
+(Variable v2 goto_delivery MiR_1) 
+(Variable v3 goto_ur MiR_2)
+(Variable v4 goto_delivery MiR_2) 
+(Variable v5 place_obj_mir_1 UR)
+(Variable v6 place_obj_mir_2 UR)
+
+# All activities have a min duration of 4 sec and unbounded max duration
+(Constraint Duration v1 v1 [4000,INF])
+(Constraint Duration v2 v2 [4000,INF])
+(Constraint Duration v3 v3 [4000,INF])
+(Constraint Duration v4 v4 [4000,INF])
+(Constraint Duration v5 v5 [4000,INF])
+(Constraint Duration v6 v6 [4000,INF])
+
+# MiR_1 and MiR_2 have to be finished with goto_ur before UR starts palce_obj  
+(Constraint Before v1 v5)
+(Constraint Before v3 v6)
+
+# UR has to have finished place_obj before MiR can start goto_delivery
+(Constraint Before v5 v2)
+(Constraint Before v6 v4)
