@@ -1,7 +1,7 @@
 # FORMAT:
 # (Variable variable_id symbol+ component)
 # (Constraint type variable_id variable_id [lb,ub]*)
-# please see XX for constraint types and bounds
+# please see the AllenIntervalConstraint Javadoc entry for more info on constraint types and bounds
 
 # A MiR does two things: goto_ur and goto_delivery
 # A UR does one thing: place_obj onto a MiR
