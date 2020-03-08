@@ -98,7 +98,6 @@ public class Parsing {
 		ConstraintNetwork ret = new ConstraintNetwork(null);
 		MultiListParser parser = new MultiListParser(spec);
 		List<Object> objs = parser.parseObjects();
-		System.out.println(objs);
 		for (int i = 0; i < objs.size(); i++) {
 			@SuppressWarnings("unchecked")
 			List<Object> oneline = (List<Object>)objs.get(i);
@@ -116,7 +115,7 @@ public class Parsing {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
 			for(String line; (line = br.readLine()) != null; ) {
-				spec += (line);
+				if (!line.startsWith("#") && !line.trim().equals("")) spec += (line);
 			}
 			br.close();
 		}

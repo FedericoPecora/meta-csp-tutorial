@@ -26,7 +26,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Calendar;
-import java.util.logging.Level;
 
 import org.metacsp.dispatching.DispatchingFunction;
 import org.metacsp.framework.ConstraintNetwork;
@@ -34,7 +33,6 @@ import org.metacsp.multi.activity.ActivityNetworkSolver;
 import org.metacsp.multi.activity.SymbolicVariableActivity;
 import org.metacsp.sensing.ConstraintNetworkAnimator;
 import org.metacsp.time.Bounds;
-import org.metacsp.utility.logging.MetaCSPLogging;
 import org.metacsp.utility.timelinePlotting.TimelinePublisher;
 import org.metacsp.utility.timelinePlotting.TimelineVisualizer;
 
@@ -47,7 +45,6 @@ public class SimpleDispatchingExampleWithSpecification {
 		long origin = Calendar.getInstance().getTimeInMillis();
 		//Create ActivityNetworkSolver, origin = current time
 		ActivityNetworkSolver ans = new ActivityNetworkSolver(origin,origin+100000);
-		MetaCSPLogging.setLevel(ans.getClass(), Level.FINE);
 
 		Parsing.setVariableFactory(ans);
 
@@ -71,7 +68,7 @@ public class SimpleDispatchingExampleWithSpecification {
 
 			@Override
 			public void dispatch(SymbolicVariableActivity act) {
-				System.out.println("MiR is executing " + act.getSymbols()[0]);
+				System.out.println("MiR starts executing " + act.getSymbols()[0]);
 			}
 		};
 
@@ -81,7 +78,7 @@ public class SimpleDispatchingExampleWithSpecification {
 
 			@Override
 			public void dispatch(SymbolicVariableActivity act) {
-				System.out.println("UR is executing " + act.getSymbols()[0]);
+				System.out.println("UR starts executing " + act.getSymbols()[0]);
 			}
 		};
 
@@ -111,6 +108,7 @@ public class SimpleDispatchingExampleWithSpecification {
 					SymbolicVariableActivity actToFinish = acts[Integer.parseInt(input)];
 					DispatchingFunction df = animator.getDispatcher().getDispatchingFunction(actToFinish.getComponent());
 					df.finish(actToFinish);
+					System.out.println(actToFinish.getComponent() + " finishes executing " + actToFinish.getSymbols()[0]);
 				}
 				catch(NumberFormatException nfe) { }
 				catch(ArrayIndexOutOfBoundsException aiob) { }
