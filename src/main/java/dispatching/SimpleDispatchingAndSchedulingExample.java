@@ -30,10 +30,8 @@ import java.util.Calendar;
 import org.metacsp.dispatching.DispatchingFunction;
 import org.metacsp.framework.ConstraintNetwork;
 import org.metacsp.framework.Variable;
-import org.metacsp.meta.symbolsAndTime.ReusableResource;
 import org.metacsp.meta.symbolsAndTime.Scheduler;
 import org.metacsp.meta.symbolsAndTime.StateVariable;
-import org.metacsp.meta.symbolsAndTime.StateVariableScheduler;
 import org.metacsp.multi.activity.Activity;
 import org.metacsp.multi.activity.ActivityNetworkSolver;
 import org.metacsp.multi.activity.SymbolicVariableActivity;
@@ -51,7 +49,7 @@ public class SimpleDispatchingAndSchedulingExample {
 		long origin = Calendar.getInstance().getTimeInMillis();
 		
 		// Create Scheduler, origin = current time
-		Scheduler svs = new Scheduler(origin, origin+100000, 0);
+		final Scheduler svs = new Scheduler(origin, origin+100000, 0);
 		
 		// Get the Scheduler's underlying ActivityNetworkSolver
 		ActivityNetworkSolver ans = (ActivityNetworkSolver)svs.getConstraintSolversFromConstraintSolverHierarchy(ActivityNetworkSolver.class)[0];
@@ -67,8 +65,11 @@ public class SimpleDispatchingAndSchedulingExample {
 		// This tells the scheduler that for the UR, it must enforce states that overlap in time
 		// must not be conflicting
 		StateVariable ur_capacity = new StateVariable(null, null, svs, new String[] {});
-		for (Variable var : ans.getVariables("UR")) ur_capacity.setUsage((Activity)var);
 		svs.addMetaConstraint(ur_capacity);
+		
+		//Make sure the scheduler knows about the activities
+		for (Variable var : ans.getVariables("UR")) ur_capacity.setUsage((Activity)var);
+		
 		// Ask the scheduler to make sure that there are no conflicts
 		// (solve the scheduling problem by imposing temporal constraints that remove temporal overlap)
 		System.out.println("Solved? " + svs.backtrack());
@@ -80,7 +81,7 @@ public class SimpleDispatchingAndSchedulingExample {
 
 		// Create animator and tell it to animate the ActivityNetworkSolver w/ period 100 msec
 		ConstraintNetworkAnimator animator = new ConstraintNetworkAnimator(ans, 100);
-
+		
 		final DispatchingFunction df_mir_1 = new DispatchingFunction("MiR_1") {	
 			@Override
 			public boolean skip(SymbolicVariableActivity act) { return false; }
@@ -132,7 +133,7 @@ public class SimpleDispatchingAndSchedulingExample {
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));  
 			try { input = br.readLine(); }
 			catch (IOException e) { e.printStackTrace(); }
-			if (!input.trim().equals("")) {
+			if (!input.trim().equals("")) {		
 				try {
 					SymbolicVariableActivity actToFinish = acts[Integer.parseInt(input)];
 					DispatchingFunction df = animator.getDispatcher().getDispatchingFunction(actToFinish.getComponent());

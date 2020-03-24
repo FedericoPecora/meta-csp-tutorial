@@ -1,0 +1,8 @@
+(Variable v1 goto_ur MiR_1)
+(Variable v2 goto_delivery MiR_1) 
+(Variable v3 place_obj_mir_1 UR)
+(Constraint Duration v1 v1 [3000,INF])
+(Constraint Duration v2 v2 [3000,INF])
+(Constraint Duration v3 v3 [3000,INF])
+(Constraint Before v1 v3)
+(Constraint Before v3 v2)

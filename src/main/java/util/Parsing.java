@@ -42,6 +42,7 @@ public class Parsing {
 	private static ActivityNetworkSolver ans = null;
 	private static HashMap<String,SymbolicVariableActivity> idsToVars = new HashMap<String, SymbolicVariableActivity>();
 	public static String s = null;
+	private static int specificationCounter = 0;
 	
 	public static void setVariableFactory(ActivityNetworkSolver solver) {
 		Parsing.ans = solver;
@@ -71,8 +72,8 @@ public class Parsing {
 		//(Constraint type varFromId varToId [lb,ub] ... [lb,ub])
 		String type_s = (String)objs.get(1);
 		AllenIntervalConstraint.Type type = AllenIntervalConstraint.Type.fromString(type_s);
-		SymbolicVariableActivity actFrom = idsToVars.get((String)objs.get(2));
-		SymbolicVariableActivity actTo = idsToVars.get((String)objs.get(3));
+		SymbolicVariableActivity actFrom = idsToVars.get((String)objs.get(2)+"__"+specificationCounter);
+		SymbolicVariableActivity actTo = idsToVars.get((String)objs.get(3)+"__"+specificationCounter);
 		ArrayList<Bounds> bounds = new ArrayList<Bounds>();
 		for (int i = 4; i < objs.size(); i++) bounds.add(processBounds((String)objs.get(i)));
 		AllenIntervalConstraint con = null;
@@ -82,7 +83,7 @@ public class Parsing {
 		con.setTo(actTo);
 		return con;
 	}
-	
+		
 	public static SymbolicVariableActivity makeVariable(List<Object> objs) {
 		String id = (String)objs.get(1);
 		String[] values = new String[objs.size()-3];
@@ -90,7 +91,7 @@ public class Parsing {
 		String component = (String)objs.get(objs.size()-1);
 		SymbolicVariableActivity act = (SymbolicVariableActivity)ans.createVariable(component);
 		act.setSymbolicDomain(values);
-		Parsing.idsToVars.put(id, act);
+		Parsing.idsToVars.put(id+"__"+specificationCounter, act);
 		return act;
 	}
 	
@@ -107,6 +108,7 @@ public class Parsing {
 				else if (onelinetype.equals("Variable")) ret.addVariable(makeVariable(oneline));
 			}
 		}
+		specificationCounter++;
 		return ret;
 	}
 	

@@ -6,6 +6,9 @@
 # A MiR does two things: goto_ur and goto_delivery
 # A UR does one thing: place_obj onto a MiR
 # There is one MiR component and one UR component
+
+
+
 (Variable v1 goto_ur MiR)
 (Variable v2 goto_delivery MiR) 
 (Variable v3 place_obj UR)
