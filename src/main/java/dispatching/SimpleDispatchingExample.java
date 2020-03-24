@@ -26,6 +26,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Calendar;
+import java.util.logging.Level;
 
 import org.metacsp.dispatching.DispatchingFunction;
 import org.metacsp.framework.ConstraintNetwork;
@@ -33,6 +34,7 @@ import org.metacsp.multi.activity.ActivityNetworkSolver;
 import org.metacsp.multi.activity.SymbolicVariableActivity;
 import org.metacsp.sensing.ConstraintNetworkAnimator;
 import org.metacsp.time.Bounds;
+import org.metacsp.utility.logging.MetaCSPLogging;
 import org.metacsp.utility.timelinePlotting.TimelinePublisher;
 import org.metacsp.utility.timelinePlotting.TimelineVisualizer;
 
@@ -42,6 +44,8 @@ public class SimpleDispatchingExample {
 	
 	public static void main(String[] args) {
 
+		MetaCSPLogging.setLevel(Level.OFF);
+		
 		long origin = Calendar.getInstance().getTimeInMillis();
 		
 		// Create ActivityNetworkSolver, origin = current time

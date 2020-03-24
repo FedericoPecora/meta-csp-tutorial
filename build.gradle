@@ -43,3 +43,7 @@ dependencies {
   //compile fileTree(dir: 'lib', include: '**/*.jar')
 
 }
+
+run{
+  standardInput = System.in
+}
