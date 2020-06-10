@@ -1,5 +1,5 @@
 # Meta CSP Tutorial code base
-This is the cose base for the the Meta-CSP tutorial.
+This is the code base for the the Meta-CSP tutorial.
 
 ## Installation
 After cloning this repository in a directry of your choce, enter the directory with the file build.gradle and issue the command:
