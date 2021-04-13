@@ -31,8 +31,8 @@ dependencies {
 
   // This pulls in the meta-csp-framework jar
   //compile 'org.metacsp:meta-csp-framework:1.3.4'
-  //compile 'org.metacsp:meta-csp-framework:0.0.0-SNAPSHOT'
-  implementation 'com.github.FedericoPecora:meta-csp-framework:master-SNAPSHOT'
+  compile 'org.metacsp:meta-csp-framework:0.0.0-SNAPSHOT'
+  //implementation 'com.github.FedericoPecora:meta-csp-framework:master-SNAPSHOT'
 
   //For JSON file handling
   implementation 'com.google.code.gson:gson:2.8.5'

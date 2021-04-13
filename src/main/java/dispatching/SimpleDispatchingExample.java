@@ -30,6 +30,7 @@ import java.util.logging.Level;
 
 import org.metacsp.dispatching.DispatchingFunction;
 import org.metacsp.framework.ConstraintNetwork;
+import org.metacsp.framework.ConstraintSolver;
 import org.metacsp.multi.activity.ActivityNetworkSolver;
 import org.metacsp.multi.activity.SymbolicVariableActivity;
 import org.metacsp.sensing.ConstraintNetworkAnimator;
@@ -49,7 +50,7 @@ public class SimpleDispatchingExample {
 		long origin = Calendar.getInstance().getTimeInMillis();
 		
 		// Create ActivityNetworkSolver, origin = current time
-		ActivityNetworkSolver ans = new ActivityNetworkSolver(origin,origin+100000);
+		ActivityNetworkSolver ans = new ActivityNetworkSolver(origin,origin+1000000);
 
 		// Parse the specification...
 		Parsing.setVariableFactory(ans);
@@ -93,7 +94,7 @@ public class SimpleDispatchingExample {
 		TimelinePublisher tp = new TimelinePublisher(ans.getConstraintNetwork(), new Bounds(0,60000), true, "MiR", "UR", "Time");
 		TimelineVisualizer tv = new TimelineVisualizer(tp);
 		tv.startAutomaticUpdate(100);
-		
+				
 		// Poor Man's key listener ;-)
 		while (true) {			
 			System.out.println("Executing activities (press <enter> to refresh list):");

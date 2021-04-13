@@ -53,7 +53,7 @@ public class SimpleDispatchingAndSchedulingExample {
 		long origin = Calendar.getInstance().getTimeInMillis();
 		
 		// Create Scheduler, origin = current time
-		final Scheduler svs = new Scheduler(origin, origin+100000, 0);
+		final Scheduler svs = new Scheduler(origin, origin+1000000, 0);
 		
 		// Get the Scheduler's underlying ActivityNetworkSolver
 		ActivityNetworkSolver ans = (ActivityNetworkSolver)svs.getConstraintSolversFromConstraintSolverHierarchy(ActivityNetworkSolver.class)[0];
